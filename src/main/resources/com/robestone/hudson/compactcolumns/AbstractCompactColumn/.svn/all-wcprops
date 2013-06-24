@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/hudson~plugins/!svn/ver/2/compact-columns/src/main/resources/com/robestone/hudson/compactcolumns/AbstractCompactColumn
+END
+column_de.properties
+K 25
+svn:wc:ra_dav:version-url
+V 144
+/svn/hudson~plugins/!svn/ver/2/compact-columns/src/main/resources/com/robestone/hudson/compactcolumns/AbstractCompactColumn/column_de.properties
+END
+columnHeader.jelly
+K 25
+svn:wc:ra_dav:version-url
+V 142
+/svn/hudson~plugins/!svn/ver/2/compact-columns/src/main/resources/com/robestone/hudson/compactcolumns/AbstractCompactColumn/columnHeader.jelly
+END
+columnHeader_de.properties
+K 25
+svn:wc:ra_dav:version-url
+V 150
+/svn/hudson~plugins/!svn/ver/2/compact-columns/src/main/resources/com/robestone/hudson/compactcolumns/AbstractCompactColumn/columnHeader_de.properties
+END
+column.jelly
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn/hudson~plugins/!svn/ver/2/compact-columns/src/main/resources/com/robestone/hudson/compactcolumns/AbstractCompactColumn/column.jelly
+END

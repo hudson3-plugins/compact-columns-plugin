@@ -1,12 +1,14 @@
 package com.robestone.hudson.compactcolumns;
 
+import hudson.Util;
+import hudson.model.BuildHistory;
 import java.util.Locale;
 
 import hudson.model.Run;
 
 public class BuildInfo implements Comparable<BuildInfo> {
 
-	private Run<?, ?> run;
+	private BuildHistory.Record buildRecord;
 	private String color;
 	private String timeAgoString;
 	private long buildTime;
@@ -16,10 +18,10 @@ public class BuildInfo implements Comparable<BuildInfo> {
 	private boolean isLatestBuild;
 	private boolean multipleBuilds;
 	
-	public BuildInfo(Run<?, ?> run, String color, String timeAgoString,
+	public BuildInfo(BuildHistory.Record buildRecord, String color, String timeAgoString,
 			long buildTime, String status, String urlPart,
 			boolean isLatestBuild) {
-		this.run = run;
+		this.buildRecord = buildRecord;
 		this.color = color;
 		this.timeAgoString = timeAgoString;
 		this.buildTime = buildTime;
@@ -28,7 +30,7 @@ public class BuildInfo implements Comparable<BuildInfo> {
 		this.isLatestBuild = isLatestBuild;
 	}
 	public Run<?, ?> getRun() {
-		return run;
+		return buildRecord.getBuild();
 	}
 	public String getColor() {
 		return color;
@@ -69,8 +71,17 @@ public class BuildInfo implements Comparable<BuildInfo> {
 		return Messages._builtAt(time).toString(locale);
 	}
 	public String getLastedDuration(Locale locale) {
-		return Messages._lastedDuration(run.getDurationString()).toString(locale);
+		return Messages._lastedDuration( getDurationString(buildRecord)).toString(locale);
 	}
+        
+        private String getDurationString(BuildHistory.Record buildRecord) {
+            if (buildRecord.isBuilding()) {
+                return hudson.model.Messages.Run_InProgressDuration(
+                        Util.getTimeSpanString(System.currentTimeMillis() - buildRecord.getTimeInMillis()));
+            }
+            return Util.getTimeSpanString(buildRecord.getDuration());
+        }
+        
 	public String getFontWeight() {
     	if (isLatestBuild && multipleBuilds) {
     		return "bold";
@@ -88,6 +99,6 @@ public class BuildInfo implements Comparable<BuildInfo> {
 	 * Sort by build number.
 	 */
 	public int compareTo(BuildInfo that) {
-		return new Integer(that.run.number).compareTo(this.run.number);
+		return new Integer(that.buildRecord.getNumber()).compareTo(this.buildRecord.getNumber());
 	}
 }

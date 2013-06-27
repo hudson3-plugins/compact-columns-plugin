@@ -23,9 +23,11 @@
  */
 package com.robestone.hudson.compactcolumns;
 
+import hudson.model.BuildHistory;
 import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
+import hudson.model.RunMap;
 import java.util.Date;
 
 import java.util.List;
@@ -153,7 +155,7 @@ public class CompactColumnsTest extends TestCase {
 		public TestRun(Job job, long timestamp, Result result) {
 			super(job, timestamp);
 			this.number = (int) timestamp;
-			this.result = result;
+			this.setResult(result);
 		}
 		public void setPrevious(Run previous) {
 			this.previousBuild = previous;
@@ -169,7 +171,7 @@ public class CompactColumnsTest extends TestCase {
 	}
 	@SuppressWarnings("unchecked")
 	private static class TestJob extends Job {
-		private SortedMap runs = new TreeMap();
+		private RunMap runs = new RunMap(this);
 		public TestJob() {
 			super(null, null);
 		}
@@ -187,5 +189,10 @@ public class CompactColumnsTest extends TestCase {
 		@Override
 		protected void removeRun(Run run) {
 		}
+
+                @Override
+                public BuildHistory getBuildHistory() {
+                    return runs;
+                }
 	}
 }

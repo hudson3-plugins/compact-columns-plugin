@@ -24,9 +24,9 @@
 package com.robestone.hudson.compactcolumns;
 
 
+import hudson.model.BuildHistory;
 import hudson.model.Job;
 import hudson.model.Result;
-import hudson.model.Run;
 import hudson.views.ListViewColumn;
 import hudson.views.ListViewColumnDescriptor;
 
@@ -91,12 +91,13 @@ public abstract class AbstractCompactColumn extends ListViewColumn {
      */
     public BuildInfo getLastFailedBuild(Job<?, ?> job) {
     	boolean onlyIfLastCompleted = isFailedShownOnlyIfLast();
-    	Run<?, ?> lastFailedBuild = job.getLastFailedBuild();
-    	Run<?, ?> lastCompletedBuild = job.getLastCompletedBuild();
+        BuildHistory buildHistory = job.getBuildHistory();
+    	BuildHistory.Record lastFailedBuild = buildHistory.getLastFailed();
+    	BuildHistory.Record lastCompletedBuild = buildHistory.getLastCompleted();
     	if (lastFailedBuild == null) {
     		return null;
-    	} else if (!onlyIfLastCompleted || (lastCompletedBuild.number == lastFailedBuild.number)) {
-        	return createBuildInfo(job.getLastFailedBuild(), "red", getFailedMessage(), "lastFailedBuild", job);
+    	} else if (!onlyIfLastCompleted || (lastCompletedBuild.getNumber() == lastFailedBuild.getNumber())) {
+        	return createBuildInfo(buildHistory.getLastFailed(), "red", getFailedMessage(), "lastFailedBuild", job);
     	} else {
     		return null;
     	}
@@ -105,32 +106,30 @@ public abstract class AbstractCompactColumn extends ListViewColumn {
     abstract protected boolean isUnstableShownOnlyIfLast();
 
     public BuildInfo getLastStableBuild(Job<?, ?> job) {
-    	return createBuildInfo(job.getLastStableBuild(), "blue", getStableMessage(), "lastStableBuild", job);
+        final BuildHistory buildHistory = job.getBuildHistory();
+        
+    	return createBuildInfo(buildHistory.getLastStable(), "blue", getStableMessage(), "lastStableBuild", job);
     }
 
     public BuildInfo getLastUnstableBuild(Job<?, ?> job) {
-    	Run<?, ?> lastUnstable = null;
-    	Run<?, ?> latest = job.getLastBuild();
-    	while (latest != null) {
-    		if (latest.getResult() == Result.UNSTABLE) {
-    			lastUnstable = latest;
-    			break;
-    		}
-    		latest = latest.getPreviousBuild();
-    	}
-    	if (lastUnstable == null) {
+    	
+        BuildHistory buildHistory = job.getBuildHistory();
+        BuildHistory.Record lastUnstable = buildHistory.getLastUnstable();
+        if (lastUnstable == null) {
     		return null;
     	}
-
-    	Run<?, ?> lastCompleted = job.getLastCompletedBuild();
-    	boolean isLastCompleted = (lastCompleted != null && lastCompleted.number == lastUnstable.number);
+        
+        BuildHistory.Record lastCompleted = buildHistory.getLastCompleted();
+    	
+    	
+    	boolean isLastCompleted = (lastCompleted != null && lastCompleted.getNumber() == lastUnstable.getNumber());
     	if (isUnstableShownOnlyIfLast() && !isLastCompleted) {
     		return null;
     	}
     	
-		String unstableColor = "orange"; // best color that is "yellow" but visible too
+	String unstableColor = "orange"; // best color that is "yellow" but visible too
 		
-    	return createBuildInfo(lastUnstable, unstableColor, getUnstableMessage(), String.valueOf(lastUnstable.number), job);
+    	return createBuildInfo(lastUnstable, unstableColor, getUnstableMessage(), String.valueOf(lastUnstable.getNumber()), job);
     }
 
     protected void addNonNull(List<BuildInfo> builds, BuildInfo info) {
@@ -138,30 +137,34 @@ public abstract class AbstractCompactColumn extends ListViewColumn {
     		builds.add(info);
     	}
     }
-    private Run<?, ?> getLastAbortedBuild(Job<?, ?> job) {
-    	Run<?, ?> latest = job.getLastBuild();
+    private BuildHistory.Record getLastAbortedBuild(Job<?, ?> job) {
+        BuildHistory buildHistory = job.getBuildHistory();
+        
+        BuildHistory.Record latest = buildHistory.getLast();
     	while (latest != null) {
     		if (latest.getResult() == Result.ABORTED) {
     			return latest;
     		}
-    		latest = latest.getPreviousBuild();
+    		latest = latest.getPrevious();
     	}
     	return null;
     }
-    private BuildInfo createBuildInfo(Run<?, ?> run, String color, String status, String urlPart, Job<?, ?> job) {
-    	if (run != null) {
-	    	String timeAgoString = getTimeAgoString(run.getTimeInMillis());
-	    	long buildTime = run.getTime().getTime();
+    
+    private BuildInfo createBuildInfo(BuildHistory.Record buildRecord, String color, String status, String urlPart, Job<?, ?> job) {
+    	if (buildRecord != null) {
+	    	String timeAgoString = getTimeAgoString(buildRecord.getTimeInMillis());
+	    	long buildTime = buildRecord.getTimeInMillis();
 	    	if (urlPart == null) {
-	    		urlPart = String.valueOf(run.number);
+	    		urlPart = String.valueOf(buildRecord.getNumber());
 	    	}
-	    	Run<?, ?> latest = job.getLastCompletedBuild();
+                BuildHistory buildHistory = job.getBuildHistory();
+	    	BuildHistory.Record latest = buildHistory.getLastCompleted();
 	    	if (latest == null) {
-	    		latest = job.getLastBuild();
+	    		latest = buildHistory.getLast();
 	    	}
 	    	BuildInfo build = new BuildInfo(
-	    			run, color, timeAgoString, buildTime, 
-	    			status, urlPart, run.number == latest.number);
+	    			buildRecord, color, timeAgoString, buildTime, 
+	    			status, urlPart, buildRecord.getNumber() == latest.getNumber());
 	    	return build;
     	}
     	return null;

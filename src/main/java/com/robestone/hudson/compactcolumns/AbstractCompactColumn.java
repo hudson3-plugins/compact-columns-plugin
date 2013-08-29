@@ -91,7 +91,7 @@ public abstract class AbstractCompactColumn extends ListViewColumn {
      */
     public BuildInfo getLastFailedBuild(Job<?, ?> job) {
     	boolean onlyIfLastCompleted = isFailedShownOnlyIfLast();
-        BuildHistory buildHistory = job.getBuildHistory();
+        BuildHistory buildHistory = job.getBuildHistoryData();
     	BuildHistory.Record lastFailedBuild = buildHistory.getLastFailed();
     	BuildHistory.Record lastCompletedBuild = buildHistory.getLastCompleted();
     	if (lastFailedBuild == null) {
@@ -106,14 +106,14 @@ public abstract class AbstractCompactColumn extends ListViewColumn {
     abstract protected boolean isUnstableShownOnlyIfLast();
 
     public BuildInfo getLastStableBuild(Job<?, ?> job) {
-        final BuildHistory buildHistory = job.getBuildHistory();
+        final BuildHistory buildHistory = job.getBuildHistoryData();
         
     	return createBuildInfo(buildHistory.getLastStable(), "blue", getStableMessage(), "lastStableBuild", job);
     }
 
     public BuildInfo getLastUnstableBuild(Job<?, ?> job) {
     	
-        BuildHistory buildHistory = job.getBuildHistory();
+        BuildHistory buildHistory = job.getBuildHistoryData();
         BuildHistory.Record lastUnstable = buildHistory.getLastUnstable();
         if (lastUnstable == null) {
     		return null;
@@ -138,7 +138,7 @@ public abstract class AbstractCompactColumn extends ListViewColumn {
     	}
     }
     private BuildHistory.Record getLastAbortedBuild(Job<?, ?> job) {
-        BuildHistory buildHistory = job.getBuildHistory();
+        BuildHistory buildHistory = job.getBuildHistoryData();
         
         BuildHistory.Record latest = buildHistory.getLast();
     	while (latest != null) {
@@ -157,7 +157,7 @@ public abstract class AbstractCompactColumn extends ListViewColumn {
 	    	if (urlPart == null) {
 	    		urlPart = String.valueOf(buildRecord.getNumber());
 	    	}
-                BuildHistory buildHistory = job.getBuildHistory();
+                BuildHistory buildHistory = job.getBuildHistoryData();
 	    	BuildHistory.Record latest = buildHistory.getLastCompleted();
 	    	if (latest == null) {
 	    		latest = buildHistory.getLast();

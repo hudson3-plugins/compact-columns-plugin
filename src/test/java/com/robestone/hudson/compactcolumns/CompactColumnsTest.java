@@ -191,7 +191,7 @@ public class CompactColumnsTest extends TestCase {
 		}
 
                 @Override
-                public BuildHistory getBuildHistory() {
+                public BuildHistory getBuildHistoryData() {
                     return runs;
                 }
 	}

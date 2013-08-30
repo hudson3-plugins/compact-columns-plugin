@@ -27,9 +27,13 @@ import hudson.Extension;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class LastStableAndUnstableColumn extends AbstractCompactColumn {
+/**
+ * @author jacob robertson
+ */
+public class LastStableAndUnstableColumn extends AbstractStatusesColumn {
 	@DataBoundConstructor
 	public LastStableAndUnstableColumn() {
+		super(null, null);
 	}
 	@Override
 	protected boolean isFailedShownOnlyIfLast() {

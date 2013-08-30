@@ -24,12 +24,24 @@
 package com.robestone.hudson.compactcolumns;
 
 import hudson.Extension;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class AllStatusesColumn extends AbstractCompactColumn {
+/**
+ * @author jacob robertson
+ */
+public class AllStatusesColumn extends AbstractStatusesColumn {
+	
+	private boolean onlyShowLastStatus;
+    private int hideDays;
+
 	@DataBoundConstructor
-	public AllStatusesColumn() {
+	public AllStatusesColumn(String colorblindHint, boolean onlyShowLastStatus, String timeAgoTypeString, int hideDays) {
+    	super(colorblindHint, timeAgoTypeString);
+    	this.onlyShowLastStatus = onlyShowLastStatus;
+    	this.hideDays = hideDays;
+    }
+    public int getHideDays() {
+		return hideDays;
 	}
 	@Override
 	protected boolean isFailedShownOnlyIfLast() {
@@ -39,13 +51,19 @@ public class AllStatusesColumn extends AbstractCompactColumn {
 	protected boolean isUnstableShownOnlyIfLast() {
 		return false;
 	}
-
+	public boolean isOnlyShowLastStatus() {
+		return onlyShowLastStatus;
+	}
 	@Extension
 	public static class AllStatusesColumnDescriptor extends
 			AbstractCompactColumnDescriptor {
 		@Override
 		public String getDisplayName() {
-			return Messages.Compact_Column_All_Statuses();
+			return Messages.Compact_Column_Statuses_w_Options();
 		}
+		@Override
+        public String getHelpFile() {
+            return "/plugin/compact-columns/all-statuses-column.html";
+        }
 	}
 }
